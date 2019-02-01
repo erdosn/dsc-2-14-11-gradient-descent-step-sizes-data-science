@@ -214,3 +214,140 @@ This technique is pretty magical.  By looking at the tangent line at each point,
 We started this section with saying that we wanted a technique to find a $m$ value that would minimize our RSS, given a value of $b$.  We did not want to simply try all of the values of $m$ as doing so would be inefficient.  Instead, we went with the approach of gradient descent, where we try variations of regression lines iteratively changing our $m$ variable and assessing our RSS to see if we are making progress.
 
 In this lesson, we focused in on how to know which direction to alter a given variable, $m$ or $b$, as well as a technique for determining the size of the change to apply to one of our variables.  We used the line tangent to our cost curve at a given point to indicate the direction and size of the update to $m$.  The further away, the steeper the curve and thus the larger the step we would want to take.  Appropriately, our tangent line slope would have us take a larger step.  And the closer we are to the ideal $b$ value, the flatter the tangent line to the curve, and the smaller a step we would take. 
+
+### Objectives
+YWBAT
+* define gradient descent, cost function, step size
+* determine an optimal value using gradient descent
+
+
+```python
+import numpy as np
+from random import shuffle
+
+import matplotlib.pyplot as plt
+```
+
+
+```python
+x = np.linspace(0, 100, 1000)
+```
+
+
+```python
+noise = np.random.normal(50, 50, size=1000)
+```
+
+
+```python
+shuffle(noise)
+```
+
+
+```python
+y = 25*x + 10*noise
+```
+
+
+```python
+y_preds = 20*x
+```
+
+
+```python
+plt.scatter(x, y)
+plt.plot(x, y_preds, c='r')
+```
+
+
+
+
+    [<matplotlib.lines.Line2D at 0x11ded57f0>]
+
+
+
+
+![png](index_files/index_38_1.png)
+
+
+
+```python
+slopes_to_try = np.linspace(20, 50, 1000)
+```
+
+
+```python
+def rmse(y, y_preds):
+    diffs_sq = (y-y_preds)**2
+    return np.sqrt(diffs_sq.mean())
+```
+
+
+```python
+errors = []
+for slope in slopes_to_try:
+    y_hat = slope*x
+    error = rmse(y, y_hat)
+    errors.append(error)
+```
+
+
+```python
+plt.plot(slopes_to_try, errors)
+plt.xlabel('Slopes')
+plt.ylabel('Error (RMSE)')
+```
+
+
+
+
+    Text(0,0.5,'Error (RMSE)')
+
+
+
+
+![png](index_files/index_42_1.png)
+
+
+
+```python
+m_0 = 40
+```
+
+
+```python
+initial_error = rmse(y, m_0*x)
+```
+
+
+```python
+initial_error
+```
+
+
+
+
+    713.9603763412549
+
+
+
+
+```python
+# r(m) = sqrt(1/n(y - m*x))
+# dr/dm (m) = 1/2 (1/n(y - m*x)) * (1/n*-x)-1/2
+
+def der_rmse(y, y_preds, m, x):
+    return 0.5*(np.mean(2*(y-y_preds))) * 1/(np.sqrt(np.mean(x)))
+```
+
+
+```python
+der_rmse(y, m_0*x, m_0, x)
+```
+
+
+
+
+    -17.536951159828508
+
+
